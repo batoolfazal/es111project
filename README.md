@@ -1,4 +1,4 @@
-# es111project
+# Code for Statistical Analysis of Movie Dataset Using Python
 Dataset used: moviesdata.csv
 This repository contains code and analysis for our ES-111 course project.
 
