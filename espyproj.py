@@ -192,22 +192,7 @@ print(f"3. The tolerance interval successfully captured {valid_percentage:.2f}% 
 print("4. The hypothesis test provides insight about whether average ratings exceed 6.0")
 print("5. Visualizations show the distribution of ratings and genres in the dataset")
 
-
-
-
-
-
-
 print("\n\n\n\n\n\n\n")
-
-
-
-
-
-
-
-
-
 
 # ===== BUDGET IMPACT ANALYSIS =====
 print("\n===== BUDGET IMPACT ANALYSIS =======\n")
