@@ -4,13 +4,70 @@ import matplotlib.pyplot as plt
 import scipy.stats as st
 from sklearn.model_selection import train_test_split
 
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import scipy.stats as st
+from sklearn.model_selection import train_test_split
+
 # Load the dataset
 try:
     data = pd.read_csv('moviesdata.csv')
     print("Dataset loaded successfully!")
-except FileNotFoundError:
-    print("Error: 'moviesdata.csv' not found in the current directory.")
+    
+    # ===== SAFER DATA CLEANING =====
+    print("\n===== DATA CLEANING =====")
+    
+    # 1. Check for missing values
+    print("\nMissing values before cleaning:")
+    print(data.isna().sum())
+    
+    # 2. Handle missing values in critical columns
+    critical_cols = ['vote_average', 'popularity']
+    for col in critical_cols:
+        if col in data.columns:
+            data = data[data[col].notna()]
+    
+    # 3. Clean budget and revenue (common issues in movie datasets)
+    if 'budget' in data.columns:
+        data = data[data['budget'] > 0]  # Remove $0 budgets
+    if 'revenue' in data.columns:
+        data = data[data['revenue'] > 0]  # Remove $0 revenues
+    
+    # 4. Clean genres
+    if 'genres' in data.columns:
+        data['genres'] = data['genres'].fillna('Unknown')
+        data['primary_genre'] = data['genres'].str.split().str[0].fillna('Unknown')
+    
+    # 5. Convert numeric columns safely
+    numeric_cols = ['budget', 'revenue', 'vote_average', 'popularity', 'runtime', 'vote_count']
+    for col in numeric_cols:
+        if col in data.columns:
+            data[col] = pd.to_numeric(data[col], errors='coerce')
+    
+    # 6. Final check
+    print("\nMissing values after cleaning:")
+    print(data.isna().sum())
+    print(f"\nFinal dataset shape: {data.shape}")
+    
+except Exception as e:
+    print(f"Error loading or cleaning data: {str(e)}")
     exit()
+
+# ===== REST OF YOUR ORIGINAL ANALYSIS CODE =====
+# (All your existing visualization and statistical analysis code goes here)
+# Just make sure to use the cleaned columns like 'primary_genre' instead of raw 'genres'
+
+# Example of your original code that will now work with cleaned data:
+# Histogram of vote_average
+plt.figure(figsize=(10, 5))
+plt.hist(data['vote_average'], bins=15, edgecolor='black', alpha=0.7)
+plt.title('Distribution of vote_average (Cleaned Data)')
+plt.xlabel('vote_average')
+plt.ylabel('Frequency')
+plt.savefig('vote_histogram.png', bbox_inches='tight')
+plt.close()
+print("Saved vote_histogram.png")
 
 # 1. Basic Statistics for vote_average
 print("\n===== BASIC STATISTICS FOR VOTE_AVERAGE =====")
@@ -34,27 +91,41 @@ plt.savefig('vote_histogram.png', bbox_inches='tight')
 plt.close()
 print("Saved vote_histogram.png")
 
-# Pie chart of genres with exploded slices
-data['primary_genre'] = data['genres'].str.split().str[0]
+# Pie chart of genres with exploded slices and combined small categories
+data['primary_genre'] = data['genres'].str.split().str[0].fillna('Unknown')
 genre_counts = data['primary_genre'].value_counts()
 
-plt.figure(figsize=(10, 10))  # Slightly larger figure for better visibility
+# Combine small slices into 'Other' category
+threshold = 0.006  # 0.6% threshold
+small_slices = genre_counts[genre_counts/genre_counts.sum() < threshold]
+other_count = small_slices.sum()
+
+if len(small_slices) > 0:
+    genre_counts = genre_counts[genre_counts/genre_counts.sum() >= threshold]
+    genre_counts['Other'] = other_count
+
+plt.figure(figsize=(12, 12))
 
 # Create explode effect (0.1 separation for all slices)
 explode = [0.1] * len(genre_counts)
 
+# Custom autopct function to hide very small percentages
+def autopct_format(pct):
+    return ('%.1f%%' % pct) if pct >= threshold*100 else ''
+
 plt.pie(genre_counts,
         labels=genre_counts.index,
-        autopct='%1.1f%%',
-        explode=explode,        # This adds the separation between slices
-        #shadow=True,           # Adds subtle shadow
-        startangle=180,         # Starts at top
-        textprops={'fontsize': 6})  # Larger label font
+        autopct=autopct_format,
+        explode=explode,
+        startangle=0,
+        textprops={'fontsize': 14},
+        wedgeprops={'linewidth': 1, 'edgecolor': 'white'})
 
-plt.title('Movie Genres Distribution (Exploded View)', fontsize=14, pad=20)
-plt.savefig('genre_pie_chart_exploded.png', bbox_inches='tight', dpi=300)
+plt.title('Movie Genres Distribution ', pad=10)
+plt.tight_layout()
+plt.savefig('genre_pie_chart.png', dpi=500, bbox_inches='tight')
 plt.close()
-print("Saved exploded pie chart as 'genre_pie_chart_exploded.png'")
+print("Saved genre_pie_chart.png")
 
 # 3. Frequency Distribution
 print("\n===== FREQUENCY DISTRIBUTION =====")
