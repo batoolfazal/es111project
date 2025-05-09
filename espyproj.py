@@ -4,12 +4,6 @@ import matplotlib.pyplot as plt
 import scipy.stats as st
 from sklearn.model_selection import train_test_split
 
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import scipy.stats as st
-from sklearn.model_selection import train_test_split
-
 # Load the dataset
 try:
     data = pd.read_csv('moviesdata.csv')
