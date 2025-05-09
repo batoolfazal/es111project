@@ -15,7 +15,7 @@ try:
     data = pd.read_csv('moviesdata.csv')
     print("Dataset loaded successfully!")
     
-    # ===== SAFER DATA CLEANING =====
+    # DATA CLEANING 
     print("\n===== DATA CLEANING =====")
     
     # 1. Check for missing values
@@ -54,11 +54,6 @@ except Exception as e:
     print(f"Error loading or cleaning data: {str(e)}")
     exit()
 
-# ===== REST OF YOUR ORIGINAL ANALYSIS CODE =====
-# (All your existing visualization and statistical analysis code goes here)
-# Just make sure to use the cleaned columns like 'primary_genre' instead of raw 'genres'
-
-# Example of your original code that will now work with cleaned data:
 # Histogram of vote_average
 plt.figure(figsize=(10, 5))
 plt.hist(data['vote_average'], bins=15, edgecolor='black', alpha=0.7)
