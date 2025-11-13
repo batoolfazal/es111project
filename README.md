@@ -19,7 +19,7 @@ Python (Pandas, NumPy, Matplotlib, Seaborn, SciPy)
 Files:
 moviesdata.csv (dataset)
 
-analysis.py — Main script with all computations
+espyproj.py — Main script with all computations
 
 Contributors:
 1. Abdullah Fawad Khan - 2024038
